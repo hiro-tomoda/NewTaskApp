@@ -17,7 +17,12 @@ import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 import io.realm.Sort;
 
+
+/**
+ * メイン画面
+ */
 public class MainActivity extends AppCompatActivity {
+
     public final static String EXTRA_TASK = "hirokazu.tomoda.newtaskapp.TASK";
 
     private Realm mRealm;
@@ -30,11 +35,13 @@ public class MainActivity extends AppCompatActivity {
     private ListView mListView;
     private TaskAdapter mTaskAdapter;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // フローティングアクションボタン
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,26 +77,24 @@ public class MainActivity extends AppCompatActivity {
         mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-
                 // タスクを削除する
-
                 final Task task = (Task) parent.getAdapter().getItem(position);
 
-                // ダイアログを表示する
+                // ダイアログ設定
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-
                 builder.setTitle("削除");
                 builder.setMessage(task.getTitle() + "を削除しますか");
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
                         RealmResults<Task> results = mRealm.where(Task.class).equalTo("id", task.getId()).findAll();
 
+                        // DB削除
                         mRealm.beginTransaction();
                         results.deleteAllFromRealm();
                         mRealm.commitTransaction();
 
+                        // アラームを解除
                         Intent resultIntent = new Intent(getApplicationContext(), TaskAlarmReceiver.class);
                         PendingIntent resultPendingIntent = PendingIntent.getBroadcast(
                                 MainActivity.this,
@@ -97,7 +102,6 @@ public class MainActivity extends AppCompatActivity {
                                 resultIntent,
                                 PendingIntent.FLAG_UPDATE_CURRENT
                         );
-
                         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
                         alarmManager.cancel(resultPendingIntent);
 
@@ -106,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
                 });
                 builder.setNegativeButton("CANCEL", null);
 
+                // ダイアログ表示
                 AlertDialog dialog = builder.create();
                 dialog.show();
 
@@ -113,18 +118,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // リロード
         reloadListView();
-    }
-
-    private void reloadListView() {
-        // Realmデータベースから、「全てのデータを取得して新しい日時順に並べた結果」を取得
-        RealmResults<Task> taskRealmResults = mRealm.where(Task.class).findAllSorted("date", Sort.DESCENDING);
-        // 上記の結果を、TaskList としてセットする
-        mTaskAdapter.setTaskList(mRealm.copyFromRealm(taskRealmResults));
-        // TaskのListView用のアダプタに渡す
-        mListView.setAdapter(mTaskAdapter);
-        // 表示を更新するために、アダプターにデータが変更されたことを知らせる
-        mTaskAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -133,4 +128,19 @@ public class MainActivity extends AppCompatActivity {
 
         mRealm.close();
     }
+
+    /**
+     * リストリロード処理
+     */
+    private void reloadListView() {
+        // Realmデータベースから、「全てのデータを取得して新しい日時順に並べた結果」を取得
+        RealmResults<Task> taskRealmResults = mRealm.where(Task.class).findAllSorted("date", Sort.DESCENDING);
+        // 上記の結果を、TaskList としてセットする
+        mTaskAdapter.setTaskList(mRealm.copyFromRealm(taskRealmResults));
+        // TaskのListView用のアダプタに渡す
+        mListView.setAdapter(mTaskAdapter);
+        // 表示を更新するために、アダプタにデータが変更されたことを知らせる
+        mTaskAdapter.notifyDataSetChanged();
+    }
+
 }

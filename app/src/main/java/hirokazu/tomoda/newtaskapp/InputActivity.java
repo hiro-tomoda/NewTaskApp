@@ -21,12 +21,20 @@ import java.util.GregorianCalendar;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
+/**
+ * 入力画面
+ */
 public class InputActivity extends AppCompatActivity {
 
+    //====================================================================
+    // フィールド定義
+    //====================================================================
     private int mYear, mMonth, mDay, mHour, mMinute;
     private Button mDateButton, mTimeButton;
     private EditText mTitleEdit, mContentEdit;
     private Task mTask;
+
+    // 日付ボタンリスナー
     private View.OnClickListener mOnDateClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -45,6 +53,7 @@ public class InputActivity extends AppCompatActivity {
         }
     };
 
+    // 時間ボタンリスナー
     private View.OnClickListener mOnTimeClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -62,6 +71,7 @@ public class InputActivity extends AppCompatActivity {
         }
     };
 
+    // 決定ボタンリスナー
     private View.OnClickListener mOnDoneClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -70,15 +80,20 @@ public class InputActivity extends AppCompatActivity {
         }
     };
 
+
+    //====================================================================
+    // メソッド定義
+    //====================================================================
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_input);
 
-        // ActionBarを設定する
+        // ツールバーをアクションバーとして利用できるよう設定する
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
+            // アクションバーに戻るボタンを表示
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
@@ -126,9 +141,11 @@ public class InputActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * タスク追加処理
+     */
     private void addTask() {
         Realm realm = Realm.getDefaultInstance();
-
         realm.beginTransaction();
 
         if (mTask == null) {
@@ -155,20 +172,25 @@ public class InputActivity extends AppCompatActivity {
         Date date = calendar.getTime();
         mTask.setDate(date);
 
+        // DB登録
         realm.copyToRealmOrUpdate(mTask);
         realm.commitTransaction();
 
         realm.close();
 
+        // TaskAlarmReceiverを起動するインテント
         Intent resultIntent = new Intent(getApplicationContext(), TaskAlarmReceiver.class);
         resultIntent.putExtra(MainActivity.EXTRA_TASK, mTask.getId());
+
+        // PendingIntent
         PendingIntent resultPendingIntent = PendingIntent.getBroadcast(
                 this,
                 mTask.getId(),
                 resultIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT
+                PendingIntent.FLAG_UPDATE_CURRENT // 既存のPendingIntentがあれば、それはそのままでextraのデータだけ置き換えるという指定
         );
 
+        // 指定した時間に任意の処理をさせる
         AlarmManager alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
         alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), resultPendingIntent);
     }

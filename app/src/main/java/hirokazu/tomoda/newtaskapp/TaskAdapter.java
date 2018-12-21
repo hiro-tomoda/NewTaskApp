@@ -13,14 +13,14 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Created by ecodev10 on 2017/11/20.
+ * タスクアダプタ
  */
-
 public class TaskAdapter extends BaseAdapter {
     private LayoutInflater mLayoutInflater = null;
     private List<Task> mTaskList;
 
     public TaskAdapter(Context context) {
+        // システムレベルのサービスを取得
         mLayoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 

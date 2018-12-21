@@ -12,13 +12,11 @@ import android.support.v7.app.NotificationCompat;
 import io.realm.Realm;
 
 /**
- * Created by ecodev10 on 2017/11/20.
+ * アラームレシーバー
  */
-
 public class TaskAlarmReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-
         // 通知の設定を行う
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
         builder.setSmallIcon(R.drawable.small_icon);

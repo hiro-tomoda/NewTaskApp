@@ -7,7 +7,7 @@ import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
 /**
- * Created by ecodev10 on 2017/11/20.
+ * Taskテーブルモデル
  */
 
 public class Task extends RealmObject implements Serializable {

@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="hirokazu.tomoda.newtaskapp">
 
+    <!-- 画面スリープ中でもブロードキャストを受け取れるパーミッション -->
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
     <application
@@ -21,6 +22,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".InputActivity"
             android:label="タスク"
@@ -31,6 +33,7 @@
                 android:value="hirokazu.tomoda.newtaskapp.MainActivity"/>
         </activity>
 
+        <!-- ブロードキャストレシーバ設定 -->
         <receiver android:name=".TaskAlarmReceiver"/>
 
     </application>
